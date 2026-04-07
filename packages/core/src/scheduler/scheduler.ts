@@ -525,7 +525,9 @@ export class Scheduler {
 
     if (isWaitingForExternal && this.state.isActive) {
       // Yield to the event loop to allow external events (tool completion, user input) to progress.
-      await new Promise((resolve) => queueMicrotask(() => resolve(true)));
+      // setTimeout(0) defers to the timer phase, which runs after the I/O polling phase,
+      // ensuring pending I/O callbacks (subprocess completion, user input) are processed first.
+      await new Promise((resolve) => setTimeout(resolve, 0));
       return true;
     }
 
